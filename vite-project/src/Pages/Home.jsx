@@ -19,16 +19,23 @@ const SearchButton = styled.div`
   height: 55px;
   border: 1px solid black;
 `;
+const RedDot = styled.div`
+  background: red;
+  border-radius: 37%;
+  height: 16px;
+  width: 16px;
+`;
+const RedDotOpen = styled.div`
+  background: red;
+  border-radius: 50%;
+  height: 12px;
+  width: 12px;
+`;
 const Home = () => {
   const [page, setPage] = useState(0);
   const [camera, setCamera] = useState(false);
   const [translation, setTranslation] = useState("This is Translation...");
-  const RedDot = styled.div`
-    background: red;
-    border-radius: ${camera ? "37%" : "50%"};
-    height: ${camera ? "16px" : "12px"};
-    width: ${camera ? "16px" : "12px"};
-  `;
+
   const webcamRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const [capturing, setCapturing] = useState(false);
@@ -45,7 +52,10 @@ const Home = () => {
   );
 
   const handleStartCaptureClick = useCallback(() => {
-    setCapturing(true);
+    setCapturing(() => {
+      return true;
+    });
+    console.log("This is mediaRecordRef ", mediaRecorderRef);
     mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
       mimeType: "video/webm",
     });
@@ -54,15 +64,23 @@ const Home = () => {
       handleDataAvailable
     );
     mediaRecorderRef.current.start();
-  }, [webcamRef, setCapturing, mediaRecorderRef, handleDataAvailable]);
+  }, [
+    webcamRef,
+    setCapturing,
+    mediaRecorderRef,
+    handleDataAvailable,
+    capturing,
+  ]);
 
   const handleStopCaptureClick = useCallback(() => {
+    console.log("This is mediaRecordRef ", mediaRecorderRef);
     mediaRecorderRef.current.stop();
     setCapturing(false);
   }, [mediaRecorderRef, setCapturing]);
 
   //to download video
-  const handleDownload = useCallback(() => {
+  const SendData = useCallback(() => {
+    console.log("This is recorded chunks ", recordedChunks);
     if (recordedChunks.length) {
       const blob = new Blob(recordedChunks, {
         type: "video/webm",
@@ -74,6 +92,7 @@ const Home = () => {
       a.href = url;
       a.download = "react-webcam-stream-capture.webm";
       a.click();
+      console.log("This is a ", a);
       window.URL.revokeObjectURL(url);
       setRecordedChunks([]);
     }
@@ -113,6 +132,7 @@ const Home = () => {
                     height={400}
                   />
                 ) : null}
+
                 <Wrapper
                   className="d-flex flex-row justify-content-center"
                   style={{
@@ -122,15 +142,37 @@ const Home = () => {
                     right: 0,
                   }}
                 >
-                  <ButtonStyle
-                    variant="outlined"
-                    color="error"
-                    onClick={() => {
-                      setCamera(!camera);
-                    }}
-                  >
-                    <RedDot />
-                  </ButtonStyle>
+                  {!camera ? (
+                    <button
+                      className="btn btn-danger ms-3"
+                      onClick={() => {
+                        setCamera(true);
+                      }}
+                    >
+                      open Camera !
+                    </button>
+                  ) : capturing === true && camera === true ? (
+                    <ButtonStyle
+                      variant="outlined"
+                      color="error"
+                      onClick={async () => {
+                        handleStopCaptureClick();
+                        await SendData();
+                      }}
+                    >
+                      <RedDot />
+                    </ButtonStyle>
+                  ) : (
+                    <ButtonStyle
+                      variant="outlined"
+                      color="error"
+                      onClick={() => {
+                        handleStartCaptureClick();
+                      }}
+                    >
+                      <RedDotOpen />
+                    </ButtonStyle>
+                  )}
                 </Wrapper>
               </BackgroundCamera>
             </Wrapper>
