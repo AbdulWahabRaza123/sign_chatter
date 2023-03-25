@@ -1,13 +1,15 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import DrawerComp from "../../components/Drawer";
 import { Container, Row, Col, Image } from "../../components/Layout";
 import TextField from "@mui/material/TextField";
-import { Wrapper, H1 } from "../../components/Typography";
+import { Wrapper, H1, P } from "../../components/Typography";
 import Logo from "../assets/logo.png";
 import ToggleBtn from "../../components/ToggleBtn";
 import SearchIcon from "@mui/icons-material/Search";
 import Webcam from "react-webcam";
 import styled from "styled-components";
+import axios from "axios";
+import jsonp from "jsonp";
 import {
   videoConstraints,
   BackgroundCamera,
@@ -34,14 +36,13 @@ const RedDotOpen = styled.div`
 const Home = () => {
   const [page, setPage] = useState(0);
   const [camera, setCamera] = useState(false);
-  const [translation, setTranslation] = useState("This is Translation...");
-
+  const [translation, setTranslation] = useState("");
+  const [counter, setCounter] = useState(-1);
   const webcamRef = useRef(null);
   const mediaRecorderRef = useRef(null);
   const [capturing, setCapturing] = useState(false);
   //containing video
   const [recordedChunks, setRecordedChunks] = useState([]);
-
   const handleDataAvailable = useCallback(
     ({ data }) => {
       if (data.size > 0) {
@@ -52,18 +53,23 @@ const Home = () => {
   );
 
   const handleStartCaptureClick = useCallback(() => {
-    setCapturing(() => {
-      return true;
-    });
-    console.log("This is mediaRecordRef ", mediaRecorderRef);
-    mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
-      mimeType: "video/webm",
-    });
-    mediaRecorderRef.current.addEventListener(
-      "dataavailable",
-      handleDataAvailable
-    );
-    mediaRecorderRef.current.start();
+    try {
+      setCapturing(() => {
+        return true;
+      });
+      
+      mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
+        mimeType: "video/webm",
+      });
+      mediaRecorderRef.current.addEventListener(
+        "dataavailable",
+        handleDataAvailable
+      );
+      mediaRecorderRef.current.start();
+      
+    } catch (e) {
+      console.log("Error found ", e);
+    }
   }, [
     webcamRef,
     setCapturing,
@@ -73,30 +79,58 @@ const Home = () => {
   ]);
 
   const handleStopCaptureClick = useCallback(() => {
-    console.log("This is mediaRecordRef ", mediaRecorderRef);
-    mediaRecorderRef.current.stop();
-    setCapturing(false);
+    try {
+      mediaRecorderRef.current.stop();
+      setCapturing(false);
+      
+    } catch (e) {
+      console.log("This is error ", e);
+    }
   }, [mediaRecorderRef, setCapturing]);
 
   //to download video
-  const SendData = useCallback(() => {
-    console.log("This is recorded chunks ", recordedChunks);
+  const SendData = useCallback(async () => {
     if (recordedChunks.length) {
+      setTranslation("Loading...");
       const blob = new Blob(recordedChunks, {
         type: "video/webm",
       });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      document.body.appendChild(a);
-      a.style = "display: none";
-      a.href = url;
-      a.download = "react-webcam-stream-capture.webm";
-      a.click();
-      console.log("This is a ", a);
-      window.URL.revokeObjectURL(url);
+        const formData = new FormData();
+        formData.append("file",blob,"filename");
+        const url="http://109.205.182.203:5420/";
+        const boundary = `----${new Date().getTime()}`;
+         axios
+          .post(url, formData, {
+            headers: {
+              "Content-Type":`multipart/form-data; boundary=${boundary}`,
+            },
+          }).then((res)=>{
+            if(res.statusText=="OK"){
+              setTranslation(res.data.Prediction);
+            }
+            else{
+              setTranslation("Error, TryAgain!!!");
+            }
+          }).catch((e)=>{
+            setTranslation("Error, TryAgain!!!");
+          });
+      
       setRecordedChunks([]);
+    } else {
+      alert("Try Again!!!");
     }
   }, [recordedChunks]);
+  useEffect(() => {
+    // counter > 0 && setTimeout(() => setCounter(counter - 1), 1000);
+    if (counter > 0) {
+      setTimeout(() => setCounter(counter - 1), 1000);
+    } else if (counter == 0) {
+      setCounter(-1);
+      handleStopCaptureClick();
+      SendData();
+    }
+  }, [counter]);
+ 
   return (
     <>
       <Container>
@@ -126,7 +160,7 @@ const Home = () => {
                     imageSmoothing={true}
                     ref={webcamRef}
                     audio={false}
-                    mirrored={false}
+                    mirrored={true}
                     videoConstraints={videoConstraints}
                     width={720}
                     height={400}
@@ -155,25 +189,51 @@ const Home = () => {
                     <ButtonStyle
                       variant="outlined"
                       color="error"
-                      onClick={async () => {
-                        handleStopCaptureClick();
-                        await SendData();
-                      }}
+                      className="d-flex flex-row justify-content-center align-items-center"
                     >
-                      <RedDot />
+                      <P size="20px" color="red" weight="500" className="mb-0">
+                        {counter}
+                      </P>
+                      {/* <RedDot /> */}
                     </ButtonStyle>
-                  ) : (
+                  ) :(
                     <ButtonStyle
                       variant="outlined"
                       color="error"
-                      onClick={() => {
+                      onClick={() => {                       
+                        setCounter(5);
                         handleStartCaptureClick();
+                        
                       }}
                     >
                       <RedDotOpen />
                     </ButtonStyle>
                   )}
                 </Wrapper>
+                {camera ? (
+                  <Wrapper
+                    className="d-flex flex-row justify-content-end"
+                    style={{
+                      position: "absolute",
+                      top: "16px",
+                      right: "10px",
+                    }}
+                  >
+                    <P
+                      color="red"
+                      style={{
+                        borderBottom: "1px solid red",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        setCamera(false);
+                        setTranslation("");
+                      }}
+                    >
+                      Close Camera
+                    </P>
+                  </Wrapper>
+                ) : null}
               </BackgroundCamera>
             </Wrapper>
 
