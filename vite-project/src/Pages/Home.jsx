@@ -1,15 +1,11 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import DrawerComp from "../../components/Drawer";
-import { Container, Row, Col, Image } from "../../components/Layout";
-import TextField from "@mui/material/TextField";
-import { Wrapper, H1, P } from "../../components/Typography";
+import { Container,Image } from "../../components/Layout";
+import { Wrapper, P } from "../../components/Typography";
+import {Spacer} from "../../components/Spacer";
 import Logo from "../assets/logo.png";
-import ToggleBtn from "../../components/ToggleBtn";
-import SearchIcon from "@mui/icons-material/Search";
 import Webcam from "react-webcam";
-import styled from "styled-components";
 import axios from "axios";
-import jsonp from "jsonp";
 import {
   videoConstraints,
   BackgroundCamera,
@@ -19,8 +15,8 @@ import {
   SearchButton
 } from "../../components/Style";
 
-const Home = () => {
-  const [page, setPage] = useState(0);
+const Home = (props) => {
+ 
   const [camera, setCamera] = useState(false);
   const [translation, setTranslation] = useState("");
   const [counter, setCounter] = useState(-1);
@@ -119,26 +115,10 @@ const Home = () => {
   return (
     <>
       <Container>
-        <Wrapper
-          className="d-flex flex-row align-items-center justify-content-between mt-5"
-          style={{ marginRight: "1.7%" }}
-        >
-          <DrawerComp page={page} setPage={setPage} />
-          <Image
-            className="img-fluid"
-            src={Logo}
-            alt="Logo"
-            width="100px"
-            height="100px"
-          />
-          <div className="me-5" />
-        </Wrapper>
-        <Wrapper className="d-flex flex-row align-items-center justify-content-center mt-3 mb-5">
-          <ToggleBtn page={page} setPage={setPage} />
-        </Wrapper>
-        {page === 0 ? (
+        <Spacer height="30px"/>
+        {props.page === 0 ? (
           <>
-            <Wrapper className="d-flex flex-row justify-content-center mb-3">
+          <Wrapper className="d-flex flex-row justify-content-center mb-3">
               <BackgroundCamera>
                 {camera ? (
                   <Webcam
@@ -186,10 +166,11 @@ const Home = () => {
                     <ButtonStyle
                       variant="outlined"
                       color="error"
-                      onClick={() => {  
+                      onClick={() => {
+                        handleStartCaptureClick();
                         setTranslation("");                     
                         setCounter(5);
-                        handleStartCaptureClick();
+                       
                         
                       }}
                     >
@@ -229,51 +210,9 @@ const Home = () => {
             </Wrapper>
           </>
         ) : null}
-        {page === 1 ? (
+        {props.page === 1 ? (
           <>
-            <Wrapper className="d-flex flex-row justify-content-center">
-              <TextField
-                id="outlined-basic"
-                label="ASL Dictionary"
-                variant="outlined"
-                value={""}
-                sx={{
-                  width: "400px",
-                  color: "black",
-                }}
-              />
-              <SearchButton>
-                <SearchIcon
-                  className="ms-2 me-1 mt-1"
-                  style={{
-                    width: "50px",
-                    height: "50px",
-                    color: "black",
-                    cursor: "pointer",
-                  }}
-                />
-              </SearchButton>
-            </Wrapper>
-            <Container
-              style={{
-                marginLeft: "100px",
-                marginRight: "100px",
-              }}
-            >
-              <Wrapper className="mt-5">This is Data...</Wrapper>
-            </Container>
-          </>
-        ) : null}
-        {page === 2 ? (
-          <>
-            <Container
-              style={{
-                marginLeft: "100px",
-                marginRight: "100px",
-              }}
-            >
-              <Wrapper className="mt-5">This is About...</Wrapper>
-            </Container>
+           
           </>
         ) : null}
       </Container>

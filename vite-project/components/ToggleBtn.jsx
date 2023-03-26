@@ -3,7 +3,7 @@ import ToggleButton from "@mui/material/ToggleButton";
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import { styled } from "@mui/material/styles";
 export default function ToggleBtn(props) {
-  const [alignment, setAlignment] = useState("psl");
+  const [alignment, setAlignment] = useState("asl");
 
   const handleChange = (event, newAlignment) => {
     setAlignment(newAlignment);

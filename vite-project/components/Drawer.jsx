@@ -13,8 +13,9 @@ import MailIcon from "@mui/icons-material/Mail";
 import MenuIcon from "@mui/icons-material/Menu";
 import InfoIcon from "@mui/icons-material/Info";
 import LabelIcon from "@mui/icons-material/Label";
-
+import { useNavigate } from "react-router-dom";
 export default function DrawerComp(props) {
+  const router=useNavigate();
   const [state, setState] = React.useState({
     top: false,
     left: false,
@@ -47,13 +48,14 @@ export default function DrawerComp(props) {
       {/* <h1 className="ms-3 mt-5 mb-5">Menu</h1> */}
 
       <List>
-        {["PSL Dict", "ASL Dict"].map((text, index) => (
+        {[ "ASL Dict"].map((text, index) => (
           <ListItem
             key={text}
             disablePadding
             className="mt-2"
             onClick={() => {
-              props.setPage(index);
+              // props.setPage(index);
+              router(index==0?"/asld":"");
             }}
           >
             <ListItemButton>
@@ -78,7 +80,8 @@ export default function DrawerComp(props) {
             disablePadding
             className="mt-1"
             onClick={() => {
-              props.setPage(2);
+              router("/about");
+              // props.setPage(1);
             }}
           >
             <ListItemButton>
