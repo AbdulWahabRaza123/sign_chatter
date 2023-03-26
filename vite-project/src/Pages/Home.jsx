@@ -15,24 +15,10 @@ import {
   BackgroundCamera,
   BackgroundTranslation,
   ButtonStyle,
+  RedDotOpen,
+  SearchButton
 } from "../../components/Style";
-const SearchButton = styled.div`
-  background: #fd7e14;
-  height: 55px;
-  border: 1px solid black;
-`;
-const RedDot = styled.div`
-  background: red;
-  border-radius: 37%;
-  height: 16px;
-  width: 16px;
-`;
-const RedDotOpen = styled.div`
-  background: red;
-  border-radius: 50%;
-  height: 12px;
-  width: 12px;
-`;
+
 const Home = () => {
   const [page, setPage] = useState(0);
   const [camera, setCamera] = useState(false);
@@ -121,12 +107,11 @@ const Home = () => {
     }
   }, [recordedChunks]);
   useEffect(() => {
-    // counter > 0 && setTimeout(() => setCounter(counter - 1), 1000);
     if (counter > 0) {
       setTimeout(() => setCounter(counter - 1), 1000);
     } else if (counter == 0) {
-      setCounter(-1);
       handleStopCaptureClick();
+      setCounter(-1);
       SendData();
     }
   }, [counter]);
@@ -183,13 +168,14 @@ const Home = () => {
                         setCamera(true);
                       }}
                     >
-                      open Camera !
+                      turn on!
                     </button>
                   ) : capturing === true && camera === true ? (
                     <ButtonStyle
                       variant="outlined"
                       color="error"
                       className="d-flex flex-row justify-content-center align-items-center"
+                      
                     >
                       <P size="20px" color="red" weight="500" className="mb-0">
                         {counter}
@@ -200,7 +186,8 @@ const Home = () => {
                     <ButtonStyle
                       variant="outlined"
                       color="error"
-                      onClick={() => {                       
+                      onClick={() => {  
+                        setTranslation("");                     
                         setCounter(5);
                         handleStartCaptureClick();
                         
@@ -230,7 +217,7 @@ const Home = () => {
                         setTranslation("");
                       }}
                     >
-                      Close Camera
+                      close
                     </P>
                   </Wrapper>
                 ) : null}

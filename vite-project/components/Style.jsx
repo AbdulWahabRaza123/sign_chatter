@@ -28,9 +28,29 @@ const ButtonStyle = styled(Button)`
   height: 65px;
   width: 30px;
 `;
+const SearchButton = styled.div`
+  background: #fd7e14;
+  height: 55px;
+  border: 1px solid black;
+`;
+const RedDot = styled.div`
+  background: red;
+  border-radius: 37%;
+  height: 16px;
+  width: 16px;
+`;
+const RedDotOpen = styled.div`
+  background: red;
+  border-radius: 50%;
+  height: 12px;
+  width: 12px;
+`;
 export {
   videoConstraints,
   BackgroundCamera,
   BackgroundTranslation,
   ButtonStyle,
+  SearchButton,
+  RedDot,
+  RedDotOpen
 };
