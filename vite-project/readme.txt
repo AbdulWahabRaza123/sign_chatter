@@ -1,3 +1,6 @@
+Read Me
+
+
 1- Make a clone of repository by clicking code button (in green color) using HTTPS link.
 2- change directory to vite-project
 3- Install all the dependencies forcefully using npm install --force command
