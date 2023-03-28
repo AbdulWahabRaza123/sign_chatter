@@ -1,4 +1,4 @@
-# sign_chatter Read Me
+# Read Me
 
 1- Make a **clone** of repository by clicking code button (in green color) using HTTPS link.  
 2- change directory to vite-project.  
@@ -7,6 +7,6 @@
 5- to make build for project use **npm run build** command and build folder will be named as dist.  
 
 
-#Requirements
+# Requirements:
 
 1- Node.js should be installed in you PC.
