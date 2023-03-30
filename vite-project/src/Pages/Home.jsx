@@ -1,11 +1,13 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
-import DrawerComp from "../../components/Drawer";
 import { Container,Image } from "../../components/Layout";
 import { Wrapper, P } from "../../components/Typography";
+import { useMediaQuery } from 'react-responsive'
 import {Spacer} from "../../components/Spacer";
-import Logo from "../assets/logo.png";
 import Webcam from "react-webcam";
 import axios from "axios";
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import PhotoCamera from '@mui/icons-material/PhotoCamera';
 import {
   videoConstraints,
   BackgroundCamera,
@@ -16,8 +18,9 @@ import {
 } from "../../components/Style";
 
 const Home = (props) => {
- 
+  const isResponsive = useMediaQuery({ query: '(max-width: 453px)' })
   const [camera, setCamera] = useState(false);
+  const [upload,setUpload]=useState(null);
   const [translation, setTranslation] = useState("");
   const [counter, setCounter] = useState(-1);
   const webcamRef = useRef(null);
@@ -41,7 +44,7 @@ const Home = (props) => {
       });
       
       mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
-        mimeType: "video/webm",
+        mimeType: "video/*",
       });
       mediaRecorderRef.current.addEventListener(
         "dataavailable",
@@ -75,7 +78,7 @@ const Home = (props) => {
     if (recordedChunks.length) {
       setTranslation("Loading...");
       const blob = new Blob(recordedChunks, {
-        type: "video/webm",
+        type: "video/*",
       });
         const formData = new FormData();
         formData.append("file",blob,"filename");
@@ -102,6 +105,33 @@ const Home = (props) => {
       alert("Try Again!!!");
     }
   }, [recordedChunks]);
+  const UploadData = async (file) => {
+    if (file.size) {
+        const formData = new FormData();
+        formData.append("file",file,file.name);
+        setTranslation("Loading...");
+        const url="http://109.205.182.203:5420/";
+        const boundary = `----${new Date().getTime()}`;
+         axios
+          .post(url, formData, {
+            headers: {
+              "Content-Type":`multipart/form-data; boundary=${boundary}`,
+            },
+          }).then((res)=>{
+            if(res.statusText=="OK"){
+              setTranslation(res.data.Prediction);
+            }
+            else{
+              setTranslation("Error, TryAgain!!!");
+            }
+          }).catch((e)=>{
+            setTranslation("Error, TryAgain!!!");
+          });
+    
+    } else {
+      alert("Try Again!!!");
+    }
+  };
   useEffect(() => {
     if (counter > 0) {
       setTimeout(() => setCounter(counter - 1), 1000);
@@ -127,7 +157,7 @@ const Home = (props) => {
                     audio={false}
                     mirrored={true}
                     videoConstraints={videoConstraints}
-                    width={720}
+                    width={isResponsive?400:720}
                     height={400}
                   />
                 ) : null}
@@ -201,7 +231,17 @@ const Home = (props) => {
                       close
                     </P>
                   </Wrapper>
-                ) : null}
+                ) :  <IconButton aria-label="upload video" component="label">
+        <input hidden accept="video/*" type="file" onChange={(e)=>{
+          if(e.target.files[0]){
+          UploadData(e.target.files[0]);
+          }
+          else{
+            console.log("Please upload the file!!!");
+          }
+        }}/>
+        <PhotoCamera />
+      </IconButton>}
               </BackgroundCamera>
             </Wrapper>
 

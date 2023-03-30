@@ -5,6 +5,19 @@ import { Container} from "../../components/Layout";
 import SearchIcon from "@mui/icons-material/Search";
 import { Spacer } from "../../components/Spacer";
 import { SearchButton } from "../../components/Style";
+
+const words=[
+  "Banana",
+"Bar",
+"Basement",
+"Basketball",
+"Bath",
+"Bathroom",
+"Bear",
+"Beard",
+"Bed",
+"Bedroom"
+]
 const ASL = (props) => {
   return (
     <>
@@ -24,22 +37,36 @@ const ASL = (props) => {
         <SearchButton>
           <SearchIcon
             className="ms-2 me-1 mt-1"
+          variant="standard"
             style={{
               width: "50px",
               height: "50px",
               color: "black",
               cursor: "pointer",
+              outline:"none"
             }}
           />
         </SearchButton>
       </Wrapper>
-      <Container
-        style={{
-          marginLeft: "100px",
-          marginRight: "100px",
-        }}
+      </Container>
+      <Container>
+      <Container className="d-flex flex-row align-items-center justify-content-start mt-5" style={{width:"70%"}}
       >
-        <Wrapper className="mt-5">This is Data...</Wrapper>
+        <Wrapper className="mt-1"> 
+        <ul >
+          {
+            words.map((val,index)=>{
+                return( 
+                    <>
+                    <li>
+                    <P size="16px" color="black" weight="600" lHeight="21px" key={index}>{val}</P>
+                    </li>
+                    </>
+                )
+            })
+          }
+          </ul>
+          </Wrapper>
       </Container>
       </Container>
     </>

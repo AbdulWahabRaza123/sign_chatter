@@ -48,14 +48,14 @@ export default function DrawerComp(props) {
       {/* <h1 className="ms-3 mt-5 mb-5">Menu</h1> */}
 
       <List>
-        {[ "ASL Dict"].map((text, index) => (
+        {[ "ASL Dict","Instructions"].map((text, index) => (
           <ListItem
             key={text}
             disablePadding
             className="mt-2"
             onClick={() => {
               // props.setPage(index);
-              router(index==0?"/asld":"");
+              router(index==0?"/asld":"instructions");
             }}
           >
             <ListItemButton>
