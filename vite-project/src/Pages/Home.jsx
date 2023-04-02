@@ -1,26 +1,26 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
-import { Container,Image } from "../../components/Layout";
+import { Container, Image } from "../../components/Layout";
 import { Wrapper, P } from "../../components/Typography";
-import { useMediaQuery } from 'react-responsive'
-import {Spacer} from "../../components/Spacer";
+import { useMediaQuery } from "react-responsive";
+import { Spacer } from "../../components/Spacer";
 import Webcam from "react-webcam";
 import axios from "axios";
-import Button from '@mui/material/Button';
-import IconButton from '@mui/material/IconButton';
-import PhotoCamera from '@mui/icons-material/PhotoCamera';
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import PhotoCamera from "@mui/icons-material/PhotoCamera";
 import {
   videoConstraints,
   BackgroundCamera,
   BackgroundTranslation,
   ButtonStyle,
   RedDotOpen,
-  SearchButton
+  SearchButton,
 } from "../../components/Style";
 
 const Home = (props) => {
-  const isResponsive = useMediaQuery({ query: '(max-width: 453px)' })
+  const isResponsive = useMediaQuery({ query: "(max-width: 453px)" });
   const [camera, setCamera] = useState(false);
-  const [upload,setUpload]=useState(null);
+  const [upload, setUpload] = useState(null);
   const [translation, setTranslation] = useState("");
   const [counter, setCounter] = useState(-1);
   const webcamRef = useRef(null);
@@ -42,7 +42,7 @@ const Home = (props) => {
       setCapturing(() => {
         return true;
       });
-      
+
       mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
         mimeType: "video/*",
       });
@@ -51,7 +51,6 @@ const Home = (props) => {
         handleDataAvailable
       );
       mediaRecorderRef.current.start();
-      
     } catch (e) {
       console.log("Error found ", e);
     }
@@ -67,7 +66,6 @@ const Home = (props) => {
     try {
       mediaRecorderRef.current.stop();
       setCapturing(false);
-      
     } catch (e) {
       console.log("This is error ", e);
     }
@@ -80,26 +78,27 @@ const Home = (props) => {
       const blob = new Blob(recordedChunks, {
         type: "video/*",
       });
-        const formData = new FormData();
-        formData.append("file",blob,"filename");
-        const url="http://109.205.182.203:5420/";
-        const boundary = `----${new Date().getTime()}`;
-         axios
-          .post(url, formData, {
-            headers: {
-              "Content-Type":`multipart/form-data; boundary=${boundary}`,
-            },
-          }).then((res)=>{
-            if(res.statusText=="OK"){
-              setTranslation(res.data.Prediction);
-            }
-            else{
-              setTranslation("Error, TryAgain!!!");
-            }
-          }).catch((e)=>{
+      const formData = new FormData();
+      formData.append("file", blob, "filename");
+      const url = "http://109.205.182.203:5420/";
+      const boundary = `----${new Date().getTime()}`;
+      axios
+        .post(url, formData, {
+          headers: {
+            "Content-Type": `multipart/form-data; boundary=${boundary}`,
+          },
+        })
+        .then((res) => {
+          if (res.statusText == "OK") {
+            setTranslation(res.data.Prediction);
+          } else {
             setTranslation("Error, TryAgain!!!");
-          });
-      
+          }
+        })
+        .catch((e) => {
+          setTranslation("Error, TryAgain!!!");
+        });
+
       setRecordedChunks([]);
     } else {
       alert("Try Again!!!");
@@ -107,27 +106,28 @@ const Home = (props) => {
   }, [recordedChunks]);
   const UploadData = async (file) => {
     if (file.size) {
-        const formData = new FormData();
-        formData.append("file",file,file.name);
-        setTranslation("Loading...");
-        const url="http://109.205.182.203:5420/";
-        const boundary = `----${new Date().getTime()}`;
-         axios
-          .post(url, formData, {
-            headers: {
-              "Content-Type":`multipart/form-data; boundary=${boundary}`,
-            },
-          }).then((res)=>{
-            if(res.statusText=="OK"){
-              setTranslation(res.data.Prediction);
-            }
-            else{
-              setTranslation("Error, TryAgain!!!");
-            }
-          }).catch((e)=>{
+      const formData = new FormData();
+      formData.append("file", file, file.name);
+      setTranslation("Loading...");
+      const url = "http://109.205.182.203:5420/";
+      const boundary = `----${new Date().getTime()}`;
+      axios
+        .post(url, formData, {
+          headers: {
+            "Content-Type": `multipart/form-data; boundary=${boundary}`,
+          },
+         
+        })
+        .then((res) => {
+          if (res.statusText == "OK") {
+            setTranslation(res.data.Prediction);
+          } else {
             setTranslation("Error, TryAgain!!!");
-          });
-    
+          }
+        })
+        .catch((e) => {
+          setTranslation("Error, TryAgain!!!");
+        });
     } else {
       alert("Try Again!!!");
     }
@@ -141,14 +141,14 @@ const Home = (props) => {
       SendData();
     }
   }, [counter]);
- 
+
   return (
     <>
       <Container>
-        <Spacer height="30px"/>
+        <Spacer height="30px" />
         {props.page === 0 ? (
           <>
-          <Wrapper className="d-flex flex-row justify-content-center mb-3">
+            <Wrapper className="d-flex flex-row justify-content-center mb-3">
               <BackgroundCamera>
                 {camera ? (
                   <Webcam
@@ -157,7 +157,7 @@ const Home = (props) => {
                     audio={false}
                     mirrored={true}
                     videoConstraints={videoConstraints}
-                    width={isResponsive?400:720}
+                    width={isResponsive ? 400 : 720}
                     height={400}
                   />
                 ) : null}
@@ -185,23 +185,20 @@ const Home = (props) => {
                       variant="outlined"
                       color="error"
                       className="d-flex flex-row justify-content-center align-items-center"
-                      
                     >
                       <P size="20px" color="red" weight="500" className="mb-0">
                         {counter}
                       </P>
                       {/* <RedDot /> */}
                     </ButtonStyle>
-                  ) :(
+                  ) : (
                     <ButtonStyle
                       variant="outlined"
                       color="error"
                       onClick={() => {
                         handleStartCaptureClick();
-                        setTranslation("");                     
+                        setTranslation("");
                         setCounter(5);
-                       
-                        
                       }}
                     >
                       <RedDotOpen />
@@ -231,17 +228,23 @@ const Home = (props) => {
                       close
                     </P>
                   </Wrapper>
-                ) :  <IconButton aria-label="upload video" component="label">
-        <input hidden accept="video/*" type="file" onChange={(e)=>{
-          if(e.target.files[0]){
-          UploadData(e.target.files[0]);
-          }
-          else{
-            console.log("Please upload the file!!!");
-          }
-        }}/>
-        <PhotoCamera />
-      </IconButton>}
+                ) : (
+                  <IconButton aria-label="upload video" component="label">
+                    <input
+                      hidden
+                      accept="video/*"
+                      type="file"
+                      onChange={(e) => {
+                        if (e.target.files[0]) {
+                          UploadData(e.target.files[0]);
+                        } else {
+                          console.log("Please upload the file!!!");
+                        }
+                      }}
+                    />
+                    <PhotoCamera />
+                  </IconButton>
+                )}
               </BackgroundCamera>
             </Wrapper>
 
@@ -250,11 +253,7 @@ const Home = (props) => {
             </Wrapper>
           </>
         ) : null}
-        {props.page === 1 ? (
-          <>
-           
-          </>
-        ) : null}
+        {props.page === 1 ? <></> : null}
       </Container>
     </>
   );
